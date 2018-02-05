@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+  <title>Vue Bulma tab</title>
+</head>
+<body>
+
+  <div id="app">
+    <tabs>
+      <tab id="Cube" caption="Cube" selected="true">
+        <cube></cube>
+      </tab>
+      <tab id="Picture" caption="Picture">This is from Picture</tab>
+      <tab id="Document" caption="Document">This is from Document</tab>
+    </tabs>
+  </div>
+
+  <style>
+    .cubecontainer {
+      width: 50%;
+      padding: 20%;
+      perspective: 600px;
+    }
+
+    .cube {
+      border: 1px solid red;
+      transform-style: preserve-3d;
+      transform: rotateX(45deg) rotateY(-45deg);
+    }
+
+    .cube .side {
+      position: absolute;
+      width: 4rem;
+      height: 4rem;
+      padding: 10px;
+
+      border: 1px solid black;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 30px;
+    }
+
+    .cube .side.one { transform: translateZ(2rem); background: red; color: white; }
+    .cube .side.two { transform: rotateX(90deg) translateZ(2rem); }
+    .cube .side.three { transform: rotateX(-90deg) translateZ(2rem); background: green; color: white; }
+    .cube .side.four { transform: rotateY(180deg) translateZ(2rem); }
+    .cube .side.five { transform: rotateY(90deg) translateZ(2rem); background: yellow; color: black; }
+    .cube .side.six { transform: rotateY(-90deg) translateZ(2rem); background: blue; color: white; }
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.13/vue.min.js"></script>
+  <script type="text/javascript">
+
+    Vue.component('cube', {
+      template: `
+        <div class="cubecontainer">
+          <div class="cube">
+            <ul>
+              <li class="side one"><h1>1</h1></li>
+              <li class="side two"><h1>2</h1></li>
+              <li class="side three"><h1>3</h1></li>
+              <li class="side four"><h1>4</h1></li>
+              <li class="side five"><h1>5</h1></li>
+              <li class="side six"><h1>6</h1></li>
+            </ul>
+          </div>
+        </div>
+      `
+    });
+
+    Vue.component('tab', {
+      props: {
+        id: { require: true },
+        caption: { require: true },
+        selected: { default: false }
+      },
+
+      template: `
+        <div v-show="dSelected"><slot></slot></div>
+      `,
+
+      data: function() {
+        return {
+          dSelected : false
+        };
+      },
+
+      created: function() {
+        this.dSelected = this.selected;
+      },
+
+      methods: {
+        getClassSelect: function(isSelected) {
+          return (isSelected ? "is-active" : "");
+        }
+      }
+
+    });
+
+    Vue.component('tabs', {
+      template: `
+        <div>
+          <div class="tabs">
+            <ul>
+              <li v-for="tab in tabs" v-bind:class="tab.getClassSelect(tab.dSelected)">
+                <a v-on:click="setAsSelected(tab)" href="#"> {{ tab.caption }} </a>
+                </li>
+            </ul>
+          </div>
+          <div><slot></slot></div>
+        </div>
+      `,
+
+      data: function() {
+        return {
+          tabs : []
+        };
+      },
+
+      mounted: function() {
+        this.tabs = this.$children;
+      },
+
+      methods: {
+        setAsSelected: function(clicked_tab) {
+          this.tabs.forEach(tab => {
+            tab.dSelected = (tab.id == clicked_tab.id);
+          })
+        }
+      }
+
+    });
+
+    var app = new Vue({
+      el: '#app'
+    });
+
+  </script>
+
+</body>
+</html>
